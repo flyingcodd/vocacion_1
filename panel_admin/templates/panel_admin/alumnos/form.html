@@ -1,0 +1,112 @@
+
+<form class="row g-3 needs-validation" method="post" novalidate >
+    {% csrf_token %}
+    <div class="col-md-6 mb-3">
+        <label for="nombre_alumno" class="form-label font-weight-bold text-muted text-uppercase">Nombre del Alumno</label>
+        <input type="text" class="form-control" id="nombre_alumno" name="nombre_alumno" value="{{alumno.nombre_alumno}}" placeholder="Ingrese Nombre del alumno" required>
+        <div class="invalid-tooltip">
+            Por favor, ingrese un nombre de alumno válido.
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label for="apellido_alumno" class="form-label font-weight-bold text-muted text-uppercase">Apellidos del alumno</label>
+        <input type="text" class="form-control" id="apellido_alumno" name="apellido_alumno" value="{{alumno.apellido_alumno}}" placeholder="Ingrese Apellidos del alumno" required>
+        <div class="invalid-tooltip">
+            Por favor, ingrese un apellido válido.
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label for="dni_alumno" class="form-label font-weight-bold text-muted text-uppercase">DNI</label>
+        <input type="text" class="form-control" id="dni_alumno" name="dni_alumno" value="{{alumno.dni_alumno}}" placeholder="Ingrese DNI" required>
+        <div class="" id="error_dni" style="color: red;">
+           
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label for="fecha_nacimiento_alumno" class="form-label font-weight-bold text-muted text-uppercase" required>Fecha de nacimiento</label>
+        <input type="date" class="form-control" id="fecha_nacimiento_alumno" name="fecha_nacimiento_alumno" value="{{ alumno.fecha_nacimiento_alumno|date:'Y-m-d' }}" required>
+        <div class="invalid-tooltip">
+            Por favor, ingrese una fecha valida
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label for="grado_alumno" class="form-label font-weight-bold text-muted text-uppercase">Grado</label>
+        <input type="number" class="form-control" id="grado_alumno" name="grado_alumno" value="{{alumno.grado_alumno}}" placeholder="Ingrese el grado del alumno" required>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label for="genero_alumno" class="form-label font-weight-bold text-muted text-uppercase">Genero del alumno</label>
+        <select id="genero_alumno" name="genero_alumno" class="form-select form-control" required="">
+            <option value="1" {% if alumno.genero_alumno == 1 %} selected {% endif %}>Masculino</option>
+            <option value="0" {% if alumno.genero_alumno == 0 %} selected {% endif %}>Femenino</option>
+        </select>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label for="estado_alumno" class="form-label font-weight-bold text-muted text-uppercase">Estado del alumno</label>
+        <select id="estado_alumno" name="estado_alumno" class="form-select form-control">
+            <option value="1" {% if alumno.estado_alumno == 1 %} selected {% endif %}>Habilitado</option>
+            <option value="0" {% if alumno.estado_alumno == 0 %} selected {% endif %}>Inhabilitado</option>
+        </select>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label for="id_colegio" class="form-label font-weight-bold text-muted text-uppercase">Colegio del Alumno</label>
+        <select id="id_colegio" name="id_colegio" class="form-select form-control">
+            {% for colegio in colegios %}
+                <option value="{{colegio.id_colegio}}" {% if alumno.id_colegio == colegio.id_colegio %} selected {% endif %}>{{colegio.nombre_colegio}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="d-block justify-content-end mt-3">
+        <button type="submit" class="btn btn-primary">Guardar Informacion</button>
+        <a name="" id="" class="btn btn-secondary" href="{% url 'alumnos' %}" role="button">Cancelar</a>
+    </div>
+    
+</form>
+<!--validaciones :: incio-->
+<script>
+    dni_alumno = document.getElementById('dni_alumno');
+    error_dni = document.getElementById('error_dni');
+    dni_alumno.addEventListener('input', function() {
+        if (this.value == '') {
+            error_dni.innerHTML = 'El DNI no puede estar vacio'
+        }
+        if (this.value.length > 8) {
+            this.value = this.value.slice(0,8);
+            // notificar que el dni es muy largo
+            error_dni.innerHTML = 'El DNI no puede tener mas de 8 digitos';
+        }
+        // validar que solo sean numeros
+        if (isNaN(this.value)) {
+            this.value = this.value.slice(0,-1);
+            // notificar que el dni es muy largo
+            error_dni.innerHTML = 'El DNI solo puede contener numeros';
+        }
+        if (this.value.length == 8) {
+            error_dni.innerHTML = '';
+        }
+    })
+</script>
+<script>
+    nombre_alumno.addEventListener('input', function (event) {
+        // valor solo letras y acentos y ñ
+        if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]*$/.test(nombre_alumno.value)) {
+            nombre_alumno.value = nombre_alumno.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚ ]/g, "");
+        }
+    });
+    apellido_alumno.addEventListener('input', function (event) {
+        // valor solo letras y acentos
+        if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]*$/.test(apellido_alumno.value)) {
+            apellido_alumno.value = apellido_alumno.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚ ]/g, "");
+        }
+    });
+    grado_alumno.addEventListener('input', function (event) {
+        // valor solo de un digito
+        if (this.value.length > 1) {
+            this.value = this.value.slice(0,1);
+        }
+        //valor mayor a 0 y menor a 5
+        if (this.value > 5) {
+            this.value = this.value.slice(0,-1);
+        }
+    });
+</script>
+<!--validaciones :: fin-->
