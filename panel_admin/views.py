@@ -808,6 +808,8 @@ def vocaciones_crear(request):
             vocacion = TVocacion()
             vocacion.nombre_vocacion = request.POST['nombre_vocacion']
             vocacion.estado_vocacion = request.POST['estado_vocacion']
+            vocacion.intervalo_baremos_vocacion = request.POST['intervalo_baremos_vocacion']
+            vocacion.start_baremos_vocacion = request.POST['start_baremos_vocacion']
             vocacion.save()
             # retornando con mensaje de exito
             messages.success(request, 'Vocacion creada con exito')
@@ -829,6 +831,8 @@ def vocaciones_editar(request, id_vocacion):
         else:
             vocacion.nombre_vocacion = request.POST['nombre_vocacion']
             vocacion.estado_vocacion = request.POST['estado_vocacion']
+            vocacion.intervalo_baremos_vocacion = request.POST['intervalo_baremos_vocacion']
+            vocacion.start_baremos_vocacion = request.POST['start_baremos_vocacion']
             vocacion.save()
             # retornando con mensaje de exito
             messages.success(request, 'Vocacion actualizada con exito')

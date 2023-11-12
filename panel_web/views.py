@@ -11,8 +11,6 @@ from django.template.loader import get_template
 ###PDF
 import json
 from re import S
-from tkinter import Canvas
-from urllib import response
 from django.shortcuts import redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required

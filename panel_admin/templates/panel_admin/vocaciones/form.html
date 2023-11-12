@@ -9,6 +9,20 @@
         </div>
     </div>
     <div class="col-md-6 mb-3">
+        <label for="start_baremos_vocacion" class="form-label font-weight-bold text-muted text-uppercase">Nro de inicio del baremos</label>
+        <input type="number" class="form-control" id="start_baremos_vocacion" name="start_baremos_vocacion" value="{{vocacion.start_baremos_vocacion}}" placeholder="36" required>
+        <div class="invalid-tooltip">
+            Por favor, un numero de inicio de baremos válido.
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label for="intervalo_baremos_vocacion" class="form-label font-weight-bold text-muted text-uppercase">Ingrese el numero de iteracion</label>
+        <input type="text" class="form-control" id="intervalo_baremos_vocacion" name="intervalo_baremos_vocacion" value="{{vocacion.intervalo_baremos_vocacion}}" placeholder="Ejm. 2, de dos en dos" required>
+        <div class="invalid-tooltip">
+            Por favor, ingrese un intervalo de baremos válido.
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
         <label for="estado_vocacion" class="form-label font-weight-bold text-muted text-uppercase">Estado de la vocacion</label>
         <select id="estado_vocacion" name="estado_vocacion" class="form-select form-control">
             <option value="1" {% if vocacion.estado_vocacion == 1 %} selected {% endif %}>Habilitado</option>
