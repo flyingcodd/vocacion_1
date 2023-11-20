@@ -1182,3 +1182,4 @@ def check_login(request):
             return redirect('index_client')
     else:
         return redirect('login_admin')
+    

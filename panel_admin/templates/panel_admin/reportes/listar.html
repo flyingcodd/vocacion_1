@@ -10,8 +10,8 @@
                 <div class="header-title">
                     <h4 class="card-title">Reporte de colegios</h4>
                 </div>
-                <!--select-->
-                <form action="" method="post" id="form">{% csrf_token %}
+                <!--select boorar esta con hidden-->
+                <form action="" method="post" id="form" hidden>{% csrf_token %}
                 <div class="card-header d-flex justify-content-between">
                 
                     <div class="d-flex align-items-center">
@@ -108,7 +108,7 @@
                     <h4 class="card-title">Reporte de test evaludados por mes</h4>
                 </div>
                 <!--select-->
-                <div class="card-header d-flex justify-content-between">
+                <!-- <div class="card-header d-flex justify-content-between">
                     <div class="d-flex align-items-center">
                         <div class="modal-product-search d-flex">
                             <form class="mr-3 position-relative">
@@ -136,7 +136,7 @@
                         </div>
                     </div>
                     <button type="button" class="btn btn-success">Filtrar</button>
-                </div>
+                </div> -->
             </div>
             <div class="card-body">
                 <!--tabla datatable-->
@@ -168,7 +168,7 @@
                 <div class="a">
                     <div class="card-header d-flex justify-content-between">
                         <div class="header-title">
-                            <h4 class="card-title">Evolucion de test realizados por mes</h4>
+                            <h4 class="card-title">Grafico</h4>
                         </div>
                     </div>
                     <div class="card-body">

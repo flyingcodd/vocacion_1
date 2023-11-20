@@ -1,1 +1,29 @@
-policy
+{% extends "panel_admin/plantillas/base.html" %}
+{% block title %}Politicas de privacidad{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-sm-12 col-lg-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <div class="header-title">
+                    <h4 class="card-title">Politicas de privacidad</h4>
+                </div>
+            </div>
+            <div class="card-body">
+                <h5>1. Las contraseñas</h5>
+                <p>Las contraseñas son almacenadas encriptadas en la base de datos, por lo que no es posible recuperarlas. Si el usuario olvida su contraseña, deberá solicitar una nueva.</p>
+
+                <h5>2. Los datos personales</h5>
+                <p>Los datos personales son almacenados en la base de datos y son utilizados únicamente para fines de autenticación y autorización. La entidad pública del estado se compromete a no compartir los datos personales con terceros.</p>
+
+                <h5>3. Los datos de navegación</h5>
+                <p>Los datos de navegación son almacenados en la base de datos y son utilizados únicamente para fines estadísticos. La entidad pública del estado se compromete a no compartir los datos de navegación con terceros.</p>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

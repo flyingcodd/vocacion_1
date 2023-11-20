@@ -25,15 +25,18 @@ from weasyprint import HTML, CSS
 # Create your views here.
 def index(request):
     comunicados = TComunicado.objects.filter(estado_comunicado=1).order_by('-id_comunicado')
+    configuracion = TConfiguracion.objects.last()
+    context = {
+        'configuracion': configuracion
+    }
     if comunicados:
         ids_comunicados = []
         for comunicado in comunicados:
             ids_comunicados.append(comunicado.id_comunicado)
-        # obtener datos de configuraciones
-        return render(request, 'panel_client/index.html', {'comunicados': comunicados, 'ids_comunicados': ids_comunicados})
-    else:
-        return render(request, 'panel_client/index.html')
-
+        context['comunicados'] = comunicados
+        context['ids_comunicados'] = ids_comunicados
+    return render(request, 'panel_client/index.html', context)
+    
 def iniciar_seccion(request):
     if request.method == 'POST':
         username_colegio = request.POST.get('username')
