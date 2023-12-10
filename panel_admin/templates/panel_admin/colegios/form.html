@@ -29,7 +29,7 @@
     </div>
     <div class="col-md-6 mb-3">
         <label for="username_colegio" class="form-label font-weight-bold text-muted text-uppercase">Username</label>
-        <input type="text" class="form-control" id="username_colegio" name="username_colegio" value="{{colegio.usuario.username}}" placeholder="Ingrese Username">
+        <input type="text" class="form-control" id="username_colegio" name="username_colegio" value="{{colegio.usuario.username}}" placeholder="Ingrese Username" required onblur="verifyUsername()">
     </div>
     <div class="col-md-6 mb-3">
         <label for="password_colegio" class="form-label font-weight-bold text-muted text-uppercase">Nueva Contraseña</label>
@@ -75,5 +75,63 @@
             telefono_colegio.value = telefono_colegio.value.slice(0, 9);
         }
     });
+    function verifyUsername() {
+        let usernameWrite = username_colegio.value;
+        $.ajax({
+            url: "{% url 'verifyUsername' %}",
+            type: "POST",
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                username: usernameWrite,
+            },
+            success: function (response) {
+                if (response.isExist == true) {
+                    let usernameCurrent = '{{colegio.usuario.username}}';
+                    if (usernameCurrent != usernameWrite) {
+                        Swal.fire({
+                            text: response.message,
+                            icon: 'error',
+                            toast: true,
+                            position: 'top-end',
+                            timer: 3000,
+                            timerProgressBar: true,
+                            showConfirmButton: false,
+                        })
+                        username_colegio.value = '';
+                    }
+                }
+            }
+        });
+    }
+    
 </script>
 <!--validaciones :: fin-->
+
+<!--swal alert :: inicio-->
+{% if messages %}
+    {% for message in messages %}
+    {% if message.tags == 'success' %}
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: '¡Excelente!',
+            text: '{{ message }}',
+            showConfirmButton: false,
+            timer: 1500
+        })
+    </script>
+    {% endif %}
+    {% if message.tags == 'error' %}
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: '¡Error!',
+            text: '{{ message }}',
+            showConfirmButton: false,
+            timer: 1500
+        })
+    </script>
+    {% endif %}
+    {% endfor %}
+{% endif %}
+<!--swal alert :: end-->

@@ -17,14 +17,14 @@
     </div>
     <div class="col-md-6 mb-3">
         <label for="dni_usuario" class="form-label font-weight-bold text-muted text-uppercase">DNI:</label>
-        <input type="number" class="form-control" id="dni_usuario" name="dni_usuario" value="{{usuario.dni_usuario}}" placeholder="7*******" required>
+        <input type="number" class="form-control" id="dni_usuario" name="dni_usuario" value="{{usuario.dni_usuario}}" placeholder="7*******" required onblur="verifyDni()">
         <div class="invalid-tooltip">
             Por favor, ingrese un dni valido.
         </div>
     </div>
     <div class="col-md-6 mb-3">
         <label for="username_usuario" class="form-label font-weight-bold text-muted text-uppercase">Username</label>
-        <input type="text" class="form-control" id="username_usuario" name="username_usuario" value="{{usuario.usuario.username}}" placeholder="luis12***" required>
+        <input type="text" class="form-control" id="username_usuario" name="username_usuario" value="{{usuario.usuario.username}}" placeholder="luis12***" required onblur="verifyUsername()">
         <div class="invalid-tooltip">
             Por favor, ingrese un username valido.
         </div>
@@ -49,17 +49,12 @@
         </select>
     </div>
     <div class="col-md-6 mb-3">
-        <label for="is_superuser" class="form-label font-weight-bold text-muted text-uppercase">Super Usuario</label>
-        <!--radio buton es super usuario-->
-        <div class="checkbox">
-            <div class="custom-control custom-radio custom-radio-color-checked custom-control-inline">
-                <input type="radio" id="customRadio-1" name="is_superuser" class="custom-control-input bg-primary" checked>
-                <label class="custom-control-label" for="customRadio-1"> NO </label>
-             </div>
-             <div class="custom-control custom-radio custom-radio-color-checked custom-control-inline">
-                <input type="radio" id="customRadio-2" name="is_superuser" class="custom-control-input bg-success">
-                <label class="custom-control-label" for="customRadio-2"> SI </label>
-             </div>
+        <label for="superUser" class="form-label font-weight-bold text-muted text-uppercase">Super Usuario</label>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="superUser" name="superUser" {% if usuario.usuario.is_superuser %} checked {% endif %}>
+            <label class="form-check-label" for="superUser">
+                Si
+            </label>
         </div>
         <small id="passwordHelpBlock" class="form-text text-muted">
             Si es super usuario, tendra todos los permisos. Y no hace falta agregar permisos.***
@@ -70,9 +65,9 @@
     <!--agregar permisos django-->
     <div class="col-md-12 mb-3">
         <label for="permisos_usuario" class="form-label font-weight-bold text-muted text-uppercase">Permisos del usuario</label>
-        <select multiple class="form-control choicesjs" id="id_permiso" name="id_permiso[]" required>
+        <select multiple class="form-control choicesjs" id="id_permiso" name="id_permiso[]" >
             {% for permiso in permisos %}
-            <option value="{{permiso.id}}" {% if permiso in usuario.usuario.user_permissions.all %} selected {% endif %}>{{permiso.name}}</option>
+            <option value="{{permiso.content_type_id}}" {% if permiso in usuario.usuario.user_permissions.all %} selected {% endif %}>{{permiso.name}}</option>
             {% endfor %}
         </select>
         <div class="invalid-tooltip">
@@ -94,18 +89,75 @@
             dni_usuario.value = dni_usuario.value.slice(0, 8)
         }
     });
-    nombre_usuario.addEventListener('input', function (event) {
-        // valor solo letras
-        if (!/^[a-zA-Z ]*$/.test(nombre_usuario.value)) {
-            nombre_usuario.value = nombre_usuario.value.replace(/[^a-zA-Z ]/g, "");
-        }
-    });
+    // nombre_usuario.addEventListener('input', function (event) {
+    //     // valor solo letras
+    //     if (!/^[a-zA-Z ]*$/.test(nombre_usuario.value)) {
+    //         nombre_usuario.value = nombre_usuario.value.replace(/[^a-zA-Z ]/g, "");
+    //     }
+    // });
     apellido_usuario.addEventListener('input', function (event) {
         // valor solo letras
         if (!/^[a-zA-Z ]*$/.test(apellido_usuario.value)) {
             apellido_usuario.value = apellido_usuario.value.replace(/[^a-zA-Z ]/g, "");
         }
     });
+    
+    function verifyUsername() {
+        let usernameWrite = username_usuario.value;
+        $.ajax({
+            url: "{% url 'verifyUsername' %}",
+            type: "POST",
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                username: usernameWrite,
+            },
+            success: function (response) {
+                if (response.isExist == true) {
+                    let usernameCurrent = '{{usuario.usuario.username}}';
+                    if (usernameCurrent != usernameWrite) {
+                        Swal.fire({
+                            text: response.message,
+                            icon: 'error',
+                            toast: true,
+                            position: 'top-end',
+                            timer: 3000,
+                            timerProgressBar: true,
+                            showConfirmButton: false,
+                        })
+                        username_usuario.value = '';
+                    }
+                }
+            }
+        });
+    }
+    function verifyDni() {
+        let dniWrite = dni_usuario.value;
+        $.ajax({
+            url: "{% url 'verifyDni' %}",
+            type: "POST",
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                dni: dniWrite,
+            },
+            success: function (response) {
+                if (response.isExist == true) {
+                    let dniCurrent = '{{usuario.dni_usuario}}';
+                    if (dniCurrent != dniWrite) {
+                        Swal.fire({
+                            text: response.message,
+                            icon: 'error',
+                            toast: true,
+                            position: 'top-end',
+                            timer: 3000,
+                            timerProgressBar: true,
+                            showConfirmButton: false,
+                        })
+                        dni_usuario.value = '';
+                    }
+                }
+            }
+        });
+    }
 </script>
 <!--validaciones :: fin-->
 

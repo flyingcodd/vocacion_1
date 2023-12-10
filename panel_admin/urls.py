@@ -64,4 +64,6 @@ urlpatterns = [
     path('terms', views.terms, name='admin_terms'),
 
     path('reporte_general', views.reporte_general, name='reporte_general'),
+    path('verifyUsername', views.verifyUsername, name='verifyUsername'),
+    path('verifyDni', views.verifyDni, name='verifyDni'),
 ]

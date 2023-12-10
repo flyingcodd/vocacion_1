@@ -157,6 +157,10 @@ def colegios_crear(request):
         check_login(request)
         # nuevo colegio
         if request.method == 'POST':
+            usernameExist = User.objects.filter(username=request.POST['username_colegio']).exists()
+            if usernameExist:
+                messages.error(request, 'El usuario que desea crear ya existe')
+                return redirect('colegios_crear')
             username_colegio = request.POST['username_colegio']
             password_colegio = request.POST['password_colegio']
             user = User.objects.create_user(username_colegio, '', password_colegio)
@@ -187,7 +191,8 @@ def colegios_crear(request):
             return render(request, 'panel_admin/colegios/crear.html')
     except Exception as e:
         mensaje_try = 'Error: ' + str(e) + ', Contacte al administrador del sistema'
-        return HttpResponse(mensaje_try)
+        messages.error(request, mensaje_try)
+        return redirect('colegios_crear')
 @login_required(login_url='login_admin')
 @permission_required('panel_admin.mispermisos_change_tcolegio', login_url='/admin/')
 def colegios_editar(request, id_colegio):
@@ -198,6 +203,11 @@ def colegios_editar(request, id_colegio):
         if request.method == 'GET':
             return render(request, 'panel_admin/colegios/editar.html', {'colegio': colegio})
         else:
+            ## comprobar si el username existe y si es el mismo que se esta editando dejarlo pasar
+            diferemtUsername = User.objects.filter(username=request.POST['username_colegio']).exclude(id=colegio.usuario.id).exists()
+            if diferemtUsername:
+                messages.error(request, 'El usuario que desea actualizar ya existe')
+                return redirect('colegios_editar', id_colegio=id_colegio)
             colegio.codigo_colegio = request.POST['codigo_colegio']
             colegio.nombre_colegio = request.POST['nombre_colegio']
             colegio.telefono_colegio = request.POST['telefono_colegio']
@@ -228,7 +238,8 @@ def colegios_editar(request, id_colegio):
             return redirect('colegios')
     except Exception as e:
         mensaje_try = 'Error: ' + str(e) + ', Contacte al administrador del sistema'
-        return HttpResponse(mensaje_try)
+        messages.error(request, mensaje_try)
+        return redirect('colegios_editar', id_colegio=id_colegio)
 
 @login_required(login_url='login_admin')
 @permission_required('panel_admin.mispermisos_delete_tcolegio', login_url='/admin/')
@@ -558,7 +569,7 @@ def configuracion(request):
                 configuracion.correo_configuracion = 'jhon@das.cs'
                 configuracion.direccion_configuracion = 'Av. Los Alamos 123'
                 configuracion.manual_configuracion = 'manual/manual.pdf'
-                configuracion.img_firma_configuracion = 'firma/fimra.png'
+                configuracion.img_firma_configuracion = 'firma/firma.png'
                 configuracion.datos_psicologo_configuracion = 'Jhon Doe, Psicologo'
                 configuracion.save()
                 context = {
@@ -974,7 +985,12 @@ def login_admin(request):
                 messages.error(request, 'Usuario o contraseña incorrectos')
                 return redirect('login_admin')
         else:
-            return render(request, 'panel_admin/auth/login_admin.html')
+            isAuth = request.user.is_authenticated
+            if isAuth == True:
+                messages.success(request, 'Bienvenido ' + request.user.username)
+                return redirect('index')
+            else:
+                return render(request, 'panel_admin/auth/login_admin.html')
     except Exception as e:
         mensaje_try = 'Error: ' + str(e) + ', Contacte al administrador del sistema'
         return HttpResponse(mensaje_try)
@@ -1005,15 +1021,20 @@ def usuarios_crear(request):
         # nuevo usuario
         if request.method == 'POST':
             # comprobar
-            usuarioisExist = TUsuario.objects.filter(dni_usuario=request.POST['dni_usuario'])
-            if usuarioisExist:
+            usuarioisExistDNI = TUsuario.objects.filter(dni_usuario=request.POST['dni_usuario'])
+            usuarioisExistUsername = TUsuario.objects.filter(usuario__username=request.POST['username_usuario'])
+            if usuarioisExistDNI:
                 messages.error(request, 'El DNI ya se encuentra registrado')
-                return redirect('usuarios')
+                return redirect('usuarios_crear')
+            if usuarioisExistUsername:
+                messages.error(request, 'El usuario ya se encuentra registrado')
+                return redirect('usuarios_crear')
             username_usuario = request.POST['username_usuario']
             password_usuario = request.POST['password_usuario']
             user = User.objects.create_user(username_usuario, '', password_usuario)
             user.is_active = request.POST['estado_usuario']
             user.is_staff = True
+            user.is_superuser = request.POST.get('superUser', 'off') == 'on'
             user.save()
             usuario = TUsuario()
             usuario.nombre_usuario = request.POST['nombre_usuario']
@@ -1021,18 +1042,23 @@ def usuarios_crear(request):
             usuario.dni_usuario = request.POST['dni_usuario']
             usuario.estado_usuario = request.POST['estado_usuario']
             usuario.usuario = user
-            usuario.save()
+            #usuario.save()
             # agreagdo permisos
-            id_permisos = []
-            for permiso in request.POST.getlist('id_permiso[]'):
-                id_permisos.append(permiso)
-            usuario.usuario.user_permissions.set(id_permisos)
+            permision_ids = Permission.objects.filter(codename__icontains="mispermisos_", content_type_id__in=request.POST.getlist('id_permiso[]')).values_list('id', flat=True)
+            usuario.usuario.user_permissions.set(permision_ids)
+            usuario.save()
             # retornando con mensaje de exito
             messages.success(request, 'Usuario creado con exito')
             return redirect('usuarios')
         else:
             permisos = Permission.objects.filter(codename__icontains="mispermisos_").order_by('id')
-            return render(request, 'panel_admin/usuarios/crear.html' , {'permisos': permisos})
+            permisoGroup = []
+            aux = permisos[0].content_type_id
+            for permiso in permisos:
+                if permiso.content_type_id != aux:
+                    aux = permiso.content_type_id
+                    permisoGroup.append(permiso)
+            return render(request, 'panel_admin/usuarios/crear.html' , {'permisos': permisoGroup})
     except Exception as e:
         mensaje_try = 'Error: ' + str(e) + ', Contacte al administrador del sistema'
         return HttpResponse(mensaje_try)
@@ -1044,12 +1070,18 @@ def usuarios_editar(request, id_usuario):
         # editar usuario
         usuario = TUsuario.objects.get(id_usuario=id_usuario)
         if request.method == 'GET':
-            permisos = Permission.objects.filter(codename__icontains="mispermisos_")
+            permisos = Permission.objects.filter(codename__icontains="mispermisos_").order_by('id')
+            permisoGroup = []
+            aux = permisos[0].content_type_id
+            for permiso in permisos:
+                if permiso.content_type_id != aux:
+                    aux = permiso.content_type_id
+                    permisoGroup.append(permiso)
             user_permisos = usuario.usuario.user_permissions.all()
-            return render(request, 'panel_admin/usuarios/editar.html', {'usuario': usuario, 'permisos': permisos, 'user_permisos': user_permisos})
+            return render(request, 'panel_admin/usuarios/editar.html', {'usuario': usuario, 'permisos': permisoGroup, 'user_permisos': user_permisos})
         else:
             # comprobar
-            usuarioisExist = TUsuario.objects.filter(dni_usuario=request.POST['dni_usuario'])
+            usuarioisExist = TUsuario.objects.filter(dni_usuario=request.POST['dni_usuario']).exclude(id_usuario=id_usuario)
             if usuarioisExist:
                 messages.error(request, 'El DNI ya se encuentra registrado')
                 return redirect('usuarios')
@@ -1057,27 +1089,28 @@ def usuarios_editar(request, id_usuario):
             usuario.apellido_usuario = request.POST['apellido_usuario']
             usuario.dni_usuario = request.POST['dni_usuario']
             usuario.estado_usuario = request.POST['estado_usuario']
-            usuario.save()
+            #usuario.save()
             # actualizando usuario
             username_usuario = request.POST['username_usuario']
             password_usuario = request.POST['password_usuario']
             user = User.objects.get(id=usuario.usuario.id)
             user.is_active = request.POST['estado_usuario']
             user.username = username_usuario
+            user.is_superuser = request.POST.get('superUser', 'off') == 'on'
             if password_usuario != '':
                 user.set_password(password_usuario)
             user.save()
             # actualizando permisos
-            id_permisos = []
-            for permiso in request.POST.getlist('id_permiso[]'):
-                id_permisos.append(permiso)
-            usuario.usuario.user_permissions.set(id_permisos)
+            permision_ids = Permission.objects.filter(codename__icontains="mispermisos_", content_type_id__in=request.POST.getlist('id_permiso[]')).values_list('id', flat=True)
+            usuario.usuario.user_permissions.set(permision_ids)
+            usuario.save()
             # retornando con mensaje de exito
             messages.success(request, 'Usuario actualizado con exito')
             return redirect('usuarios')
     except Exception as e:
         mensaje_try = 'Error: ' + str(e) + ', Contacte al administrador del sistema'
-        return HttpResponse(mensaje_try)
+        messages.error(request, mensaje_try)
+        return redirect('usuarios_editar', id_usuario=id_usuario)
 @login_required(login_url='login_admin')
 @permission_required('panel_admin.mispermisos_delete_tusuario', login_url='/admin/')
 def usuarios_eliminar(request, id_usuario):
@@ -1183,3 +1216,39 @@ def check_login(request):
     else:
         return redirect('login_admin')
     
+
+def verifyUsername(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        if User.objects.filter(username=username).exists() or TUsuario.objects.filter(usuario__username=username).exists():
+            return JsonResponse({
+                'isExist': True,
+                'username': username,
+                'message': 'El username ya existe, por favor ingrese otro.'
+            })
+        else:
+            return JsonResponse({
+                'isExist': False,
+                'username': username,
+                'message': 'El usuario esta disponible'
+            })
+    else:
+        return redirect('index')
+    
+def verifyDni(request):
+    if request.method == 'POST':
+        dni = request.POST['dni']
+        if TUsuario.objects.filter(dni_usuario=dni).exists():
+            return JsonResponse({
+                'isExist': True,
+                'dni': dni,
+                'message': 'El DNI ya existe, por favor ingrese otro.'
+            })
+        else:
+            return JsonResponse({
+                'isExist': False,
+                'dni': dni,
+                'message': 'El DNI esta disponible'
+            })
+    else:
+        return redirect('index')
