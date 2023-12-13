@@ -79,8 +79,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'vocacion_db',
-        'USER': 'root',
-        'PASSWORD': '',
+        'USER': 'franklin',
+        'PASSWORD': 'franklin',
         'HOST': 'localhost',
         'PORT': '3306',
     }
