@@ -1,16 +1,16 @@
 --use test_db;
 
-insert into panel_admin_tcategoria value(1, 'Estilos personales','¿Se parece a mi?',1,NOT NULL);
-insert into panel_admin_tcategoria value(2, 'Actividades de preferencia','¿Soy habil?',1,NOT NULL);
-insert into panel_admin_tcategoria value(3, 'Percepción de habilidad','¿Me interesa?',1,NOT NULL);
+insert into panel_admin_tcategoria value(1, '','Estilos personales',1,'¿Se parece a mi?');
+insert into panel_admin_tcategoria value(2, '','Actividades de preferencia',1,'¿Soy habil?');
+insert into panel_admin_tcategoria value(3, '','Percepción de habilidad',1,'¿Me interesa?');
 
-insert into panel_admin_tvocacion value (1, 'Liderazgo', 1);
-insert into panel_admin_tvocacion value (2, 'Tecnico mecanico', 1);
-insert into panel_admin_tvocacion value (3, 'Social', 1);
-insert into panel_admin_tvocacion value (4, 'Organizado', 1);
-insert into panel_admin_tvocacion value (5, 'Artistico', 1);
-insert into panel_admin_tvocacion value (6, 'Emprendedor', 1);
-insert into panel_admin_tvocacion value (7, 'Investigativo', 1);
+insert into panel_admin_tvocacion value (1, 'Liderazgo',1,1 1);
+insert into panel_admin_tvocacion value (2, 'Tecnico mecanico',1,1 1);
+insert into panel_admin_tvocacion value (3, 'Social',1,1 1);
+insert into panel_admin_tvocacion value (4, 'Organizado',1,1 1);
+insert into panel_admin_tvocacion value (5, 'Artistico',1,1 1);
+insert into panel_admin_tvocacion value (6, 'Emprendedor',1,1 1);
+insert into panel_admin_tvocacion value (7, 'Investigativo',1,1 1);
 
 -- id, nombre, id_vocacion, estado
 insert into panel_admin_tcarrera value (not null, 'Derecho', 1, 1);
