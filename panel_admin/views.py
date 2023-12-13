@@ -65,21 +65,21 @@ def index(request):
             #cursor.execute("SELECT * FROM v_reportes_por_sexo order by mes desc LIMIT 6")
             cursor.execute("""
                 SELECT 
-                    strftime('%m-%Y', e.fecha_encuesta) AS 'mes',
-                    COUNT(a.id_alumno) AS 'alumnos',
-                    COUNT(CASE WHEN a.genero_alumno = 1 THEN 1 END) AS 'm',
-                    COUNT(CASE WHEN a.genero_alumno = 0 THEN 1 END) AS 'f'
-                FROM 
-                    panel_admin_talumno AS a
-                INNER JOIN 
-                    panel_admin_tcolegio AS c ON c.id_colegio = a.id_colegio
-                INNER JOIN 
-                    panel_admin_tencuesta AS e ON e.id_alumno = a.id_alumno
-                GROUP BY 
-                    strftime('%m-%Y', e.fecha_encuesta)
-                ORDER BY 
-                    e.fecha_encuesta DESC
-                LIMIT 6;
+                DATE_FORMAT(e.fecha_encuesta, '%m-%Y') AS mes,
+                COUNT(a.id_alumno) AS alumnos,
+                SUM(CASE WHEN a.genero_alumno = 1 THEN 1 ELSE 0 END) AS m,
+                SUM(CASE WHEN a.genero_alumno = 0 THEN 1 ELSE 0 END) AS f
+            FROM 
+                panel_admin_talumno AS a
+            INNER JOIN 
+                panel_admin_tcolegio AS c ON c.id_colegio = a.id_colegio
+            INNER JOIN 
+                panel_admin_tencuesta AS e ON e.id_alumno = a.id_alumno
+            GROUP BY 
+                DATE_FORMAT(e.fecha_encuesta, '%m-%Y')
+            ORDER BY 
+                e.fecha_encuesta DESC
+            LIMIT 6;
             """)
             rows = cursor.fetchall()
             sexo_alumno = []
@@ -887,11 +887,11 @@ def reportes(request):
         # cursor.execute(sql_string2)
         cursor.execute("""
             SELECT 
-                strftime('%m-%Y', e.fecha_encuesta) AS 'mes',
-                nombre_colegio AS 'colegio',
-                COUNT(a.id_alumno) AS 'alumnos',
-                COUNT(CASE WHEN a.genero_alumno = 1 THEN 1 END) AS 'm',
-                COUNT(CASE WHEN a.genero_alumno = 0 THEN 1 END) AS 'f'
+                DATE_FORMAT(e.fecha_encuesta, '%m-%Y') AS mes,
+                nombre_colegio AS colegio,
+                COUNT(a.id_alumno) AS alumnos,
+                SUM(CASE WHEN a.genero_alumno = 1 THEN 1 ELSE 0 END) AS m,
+                SUM(CASE WHEN a.genero_alumno = 0 THEN 1 ELSE 0 END) AS f
             FROM 
                 panel_admin_talumno AS a
             INNER JOIN 
@@ -899,7 +899,7 @@ def reportes(request):
             INNER JOIN 
                 panel_admin_tencuesta AS e ON e.id_alumno = a.id_alumno
             GROUP BY 
-                strftime('%m-%Y', e.fecha_encuesta),
+                DATE_FORMAT(e.fecha_encuesta, '%m-%Y'),
                 c.id_colegio
             ORDER BY 
                 e.fecha_encuesta DESC
@@ -919,22 +919,22 @@ def reportes(request):
         #reporte_grafico = "select * from v_reportes_por_sexo top limit 10"
         #cursor.execute(reporte_grafico)
         cursor.execute("""
-                SELECT 
-                    strftime('%m-%Y', e.fecha_encuesta) AS 'mes',
-                    COUNT(a.id_alumno) AS 'alumnos',
-                    COUNT(CASE WHEN a.genero_alumno = 1 THEN 1 END) AS 'm',
-                    COUNT(CASE WHEN a.genero_alumno = 0 THEN 1 END) AS 'f'
-                FROM 
-                    panel_admin_talumno AS a
-                INNER JOIN 
-                    panel_admin_tcolegio AS c ON c.id_colegio = a.id_colegio
-                INNER JOIN 
-                    panel_admin_tencuesta AS e ON e.id_alumno = a.id_alumno
-                GROUP BY 
-                    strftime('%m-%Y', e.fecha_encuesta)
-                ORDER BY 
-                    e.fecha_encuesta DESC
-                LIMIT 10;
+            SELECT 
+                DATE_FORMAT(e.fecha_encuesta, '%m-%Y') AS mes,
+                COUNT(a.id_alumno) AS alumnos,
+                SUM(CASE WHEN a.genero_alumno = 1 THEN 1 ELSE 0 END) AS m,
+                SUM(CASE WHEN a.genero_alumno = 0 THEN 1 ELSE 0 END) AS f
+            FROM 
+                panel_admin_talumno AS a
+            INNER JOIN 
+                panel_admin_tcolegio AS c ON c.id_colegio = a.id_colegio
+            INNER JOIN 
+                panel_admin_tencuesta AS e ON e.id_alumno = a.id_alumno
+            GROUP BY 
+                DATE_FORMAT(e.fecha_encuesta, '%m-%Y')
+            ORDER BY 
+                e.fecha_encuesta DESC
+            LIMIT 10;
             """)
         result_grafico =  cursor.fetchall()
         reportes_grafico = []
@@ -1181,13 +1181,13 @@ def reporte_general(request):
             cursor.execute("""  
                 select 
                 concat(MONTHNAME(e.fecha_encuesta),'-',YEAR(e.fecha_encuesta)) as 'mes',
-                nombre_colegio as 'colegio',count(a.id_alumno) as 'alumnos',
+                count(a.id_alumno) as 'alumnos',
                 count( case when a.genero_alumno = 1 then 1 end) as  m,
                 count( case when a.genero_alumno = 0 then 1 end) as  f
                 from t_alumno as a
                 inner join panel_admin_tcolegio as c on c.id_colegio=a.id_colegio
                 inner join t_encuesta as e on e.id_alumno=a.id_alumno
-                group by concat(MONTHNAME(e.fecha_encuesta),'-',YEAR(e.fecha_encuesta)),c.id_colegio
+                group by concat(MONTHNAME(e.fecha_encuesta),'-',YEAR(e.fecha_encuesta))
                 order by e.fecha_encuesta desc;
             """)
             result =  cursor.fetchall()
