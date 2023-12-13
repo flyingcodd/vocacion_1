@@ -36,7 +36,8 @@
             <label for="">Apellido</label>
         </div>
         <div class="txt_field">
-            <input disabled name="dni_alumno" id="dni_alumno" type="text" value="{{request.session.dniAlumno}}"  onblur="verifyDni()">
+            <input disabled name="dni_alumno_disabled" id="dni_alumno_disabled" type="text" value="{{request.session.dniAlumno}}" onblur="verifyDni()">
+            <input type="hidden" name="dni_alumno" id="dni_alumno" value="{{request.session.dniAlumno}}" onblur="verifyDni()">
             <span></span>
             <label for="">Dni</label>
         </div>
@@ -82,7 +83,7 @@
     // validacion de campos
     const nombre_alumno = document.getElementById('nombre_alumno');
     const apellido_alumno = document.getElementById('apellido_alumno');
-    const dni_alumno = document.getElementById('dni_alumno');
+    const dni_alumno = document.getElementById('dni_alumno_disabled');
     const fecha_nacimiento_alumno = document.getElementById('fecha_nacimiento_alumno');
     const grado_alumno = document.getElementById('grado_alumno');
 
