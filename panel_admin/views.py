@@ -1191,7 +1191,7 @@ def reporte_general(request):
                 INNER JOIN 
                     t_encuesta AS e ON e.id_alumno = a.id_alumno
                 GROUP BY 
-                    mes, YEAR(e.fecha_encuesta)
+                    mes, YEAR(e.fecha_encuesta), MONTH(e.fecha_encuesta)
                 ORDER BY 
                     YEAR(e.fecha_encuesta) DESC, MONTH(e.fecha_encuesta) DESC;
             """)
