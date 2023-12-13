@@ -120,7 +120,7 @@ class TEncuesta(models.Model):
 
 class TPregunta(models.Model):
     id_pregunta = models.AutoField(primary_key=True)
-    nombre_pregunta = models.CharField(max_length=50, blank=True, null=True)
+    nombre_pregunta = models.CharField(max_length=150, blank=True, null=True)
     estado_pregunta = models.IntegerField(blank=True, null=True)
     id_vocacion = models.ForeignKey('TVocacion', models.DO_NOTHING, db_column='id_vocacion')
     id_categoria = models.ForeignKey(TCategoria, models.DO_NOTHING, db_column='id_categoria')
