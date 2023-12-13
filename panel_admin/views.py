@@ -105,7 +105,8 @@ def index(request):
             return redirect('index')
     except Exception as e:
         mensaje_try = 'Error en index: ' + str(e) + ', Comuniquese con el administrador del sistema'
-        return HttpResponse(mensaje_try)
+        messages.error(request, mensaje_try)
+        return redirect('index')
 @login_required(login_url='login_admin')
 def encuestas(request):
     try:
