@@ -1212,7 +1212,8 @@ def reporte_general(request):
             return JsonResponse({'reportes': reportes})
     except Exception as e:
         mensaje_try = 'Error: ' + str(e) + ', Contacte al administrador del sistema'
-        return HttpResponse(mensaje_try)
+        messages.error(request, mensaje_try)
+        return JsonResponse({'reportes': []})
 
 ##### Inicio de funciones complementarias #####
 def check_login(request):
