@@ -77,8 +77,12 @@ WSGI_APPLICATION = 'vocacion_web.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'vocacion_db',
+        'USER': 'franklin',
+        'PASSWORD': 'franklin',
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
 
