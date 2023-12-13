@@ -1,4 +1,4 @@
-use test_db;
+--use test_db;
 
 insert into panel_admin_tcategoria value(1, 'Estilos personales','¿Se parece a mi?',1,NOT NULL);
 insert into panel_admin_tcategoria value(2, 'Actividades de preferencia','¿Soy habil?',1,NOT NULL);
