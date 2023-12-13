@@ -81,14 +81,14 @@ def index(request):
                 e.fecha_encuesta DESC
             LIMIT 6;
             """)
-            rows = cursor.fetchall()
+            #rows = cursor.fetchall()
             sexo_alumno = []
-            for row in rows:
-                sexo_alumno.append({
-                    'meses': row[0],
-                    'm': row[2],
-                    'f': row[3]
-                })
+            # for row in rows:
+            #     sexo_alumno.append({
+            #         'meses': row[0],
+            #         'm': row[2],
+            #         'f': row[3]
+            #     })
             # grafico de encuestas por sexo FIN
             # imprimr meses
             sexo_alumno = json.dumps(sexo_alumno)
@@ -105,8 +105,7 @@ def index(request):
             return redirect('index')
     except Exception as e:
         mensaje_try = 'Error en index: ' + str(e) + ', Comuniquese con el administrador del sistema'
-        messages.error(request, mensaje_try)
-        return redirect('index')
+        return HttpResponse(mensaje_try)
 @login_required(login_url='login_admin')
 def encuestas(request):
     try:
