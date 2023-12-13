@@ -66,4 +66,5 @@ urlpatterns = [
     path('reporte_general', views.reporte_general, name='reporte_general'),
     path('verifyUsername', views.verifyUsername, name='verifyUsername'),
     path('verifyDni', views.verifyDni, name='verifyDni'),
+    path('verifyDniAlumno', views.verifyDniAlumno, name='verifyDniAlumno'),
 ]

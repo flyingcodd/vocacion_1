@@ -292,29 +292,34 @@
         </div>
     </div>
 </div>
+
+
 <!--swal alert :: begin-->
-</script>
 {% if messages %}
     {% for message in messages %}
     {% if message.tags == 'success' %}
     <script>
         Swal.fire({
+            toast: true,
+            position: 'top-end',
             icon: 'success',
-            title: '¡Excelente!',
-            text: '{{ message }}',
+            title: '{{ message }}',
             showConfirmButton: false,
-            timer: 1500
+            timer: 1500,
+            timerProgressBar: true,
         })
     </script>
     {% endif %}
     {% if message.tags == 'error' %}
     <script>
         Swal.fire({
+            toast: true,
+            position: 'top-end',
             icon: 'error',
-            title: '¡Error!',
-            text: '{{ message }}',
+            title: '{{ message }}',
             showConfirmButton: false,
-            timer: 1500
+            timer: 1500,
+            timerProgressBar: true,
         })
     </script>
     {% endif %}

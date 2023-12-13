@@ -17,7 +17,7 @@
     </div>
     <div class="col-md-6 mb-3">
         <label for="dni_alumno" class="form-label font-weight-bold text-muted text-uppercase">DNI</label>
-        <input type="text" class="form-control" id="dni_alumno" name="dni_alumno" value="{{alumno.dni_alumno}}" placeholder="Ingrese DNI" required>
+        <input type="text" class="form-control" id="dni_alumno" name="dni_alumno" value="{{alumno.dni_alumno}}" placeholder="Ingrese DNI" required onblur="verifyDni()">
         <div class="" id="error_dni" style="color: red;">
            
         </div>
@@ -108,5 +108,33 @@
             this.value = this.value.slice(0,-1);
         }
     });
+    function verifyDni() {
+        let dniWrite = dni_alumno.value;
+        $.ajax({
+            url: "{% url 'verifyDniAlumno' %}",
+            type: "POST",
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                dni: dniWrite,
+            },
+            success: function (response) {
+                if (response.isExist == true) {
+                    let dniCurrent = '{{usuario.dni_alumno}}';
+                    if (dniCurrent != dniWrite) {
+                        Swal.fire({
+                            text: response.message,
+                            icon: 'error',
+                            toast: true,
+                            position: 'top-end',
+                            timer: 3000,
+                            timerProgressBar: true,
+                            showConfirmButton: false,
+                        })
+                        dni_alumno.value = '';
+                    }
+                }
+            }
+        });
+    }
 </script>
 <!--validaciones :: fin-->

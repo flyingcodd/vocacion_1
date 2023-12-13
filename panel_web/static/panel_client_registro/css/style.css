@@ -276,6 +276,24 @@ form .txt_field select{
 .txt_field input:valid ~ span::before{
     width: 100%;
 }
+.txt_field input:disabled {
+    /* estilos para el campo de entrada deshabilitado */
+    /*background-color: #f0f0f0; /* color de fondo gris claro */
+    color: #a0a0a0; /* color de texto gris oscuro */
+}
+
+.txt_field input:disabled ~ label {
+    /* estilos para la etiqueta después de un campo de entrada deshabilitado */
+    top: -5px;
+    left: 0px;
+    color: #2991d9; /* color de texto gris oscuro */
+}
+
+.txt_field input:disabled ~ span::before {
+    /* estilos para el span antes de un campo de entrada deshabilitado */
+    width: 100%;
+    /*background: #a0a0a0; /* color de fondo gris oscuro */
+}
 .isFocus{
     top: -5px !important;
     color: #2991d9 !important;

@@ -509,6 +509,9 @@ def respuestas(request):
             dni_alumno = request.POST['dni_alumno']
             if TAlumno.objects.filter(dni_alumno=dni_alumno).exists():
                 id_alumno = TAlumno.objects.get(dni_alumno=dni_alumno)
+                if not TEncuesta.objects.filter(id_alumno=id_alumno).exists():
+                    messages.error(request, 'El alumno aun no ha realizado el test')
+                    return render(request, 'panel_admin/respuestas/listar.html')
                 id_encuesta = TEncuesta.objects.get(id_alumno=id_alumno)
                 respuestas = TRespuesta.objects.filter(id_encuesta=id_encuesta)
                 alumno = TAlumno.objects.get(dni_alumno=dni_alumno)
@@ -552,7 +555,8 @@ def respuestas(request):
             return render(request, 'panel_admin/respuestas/listar.html')
     except Exception as e:
         mensaje_try = 'Error: ' + str(e) + ', Contacte al administrador del sistema'
-        return HttpResponse(mensaje_try)
+        messages.error(request, mensaje_try)
+        return render(request, 'panel_admin/respuestas/listar.html')
 # End Respuestas
 
 # Begin Configuracion
@@ -1053,7 +1057,7 @@ def usuarios_crear(request):
         else:
             permisos = Permission.objects.filter(codename__icontains="mispermisos_").order_by('id')
             permisoGroup = []
-            aux = permisos[0].content_type_id
+            aux = 0
             for permiso in permisos:
                 if permiso.content_type_id != aux:
                     aux = permiso.content_type_id
@@ -1072,7 +1076,7 @@ def usuarios_editar(request, id_usuario):
         if request.method == 'GET':
             permisos = Permission.objects.filter(codename__icontains="mispermisos_").order_by('id')
             permisoGroup = []
-            aux = permisos[0].content_type_id
+            aux = 0
             for permiso in permisos:
                 if permiso.content_type_id != aux:
                     aux = permiso.content_type_id
@@ -1239,6 +1243,24 @@ def verifyDni(request):
     if request.method == 'POST':
         dni = request.POST['dni']
         if TUsuario.objects.filter(dni_usuario=dni).exists():
+            return JsonResponse({
+                'isExist': True,
+                'dni': dni,
+                'message': 'El DNI ya existe, por favor ingrese otro.'
+            })
+        else:
+            return JsonResponse({
+                'isExist': False,
+                'dni': dni,
+                'message': 'El DNI esta disponible'
+            })
+    else:
+        return redirect('index')
+     
+def verifyDniAlumno(request):
+    if request.method == 'POST':
+        dni = request.POST['dni']
+        if TAlumno.objects.filter(dni_alumno=dni).exists():
             return JsonResponse({
                 'isExist': True,
                 'dni': dni,

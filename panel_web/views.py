@@ -294,10 +294,10 @@ def generar_pdf(request, id_ficha_alumno):
         response['Content-Disposition'] = 'filename="report-{}.pdf"'.format(ficha_alumno.id_alumno.dni_alumno)
         return response
     else:
-        messages.error(request, 'No se encontro el registro')
+        messages.error(request, 'No se encontro la ficha del alumno, El error se puede deber a que el test no existe')
         # retornar el mensaje error
-        return HttpResponse('No se encontro la ficha del alumno, El error se puede deber a que el test no existe "falta completar" o fue eliminado')
-
+        # return HttpResponse('No se encontro la ficha del alumno, El error se puede deber a que el test no existe "falta completar" o fue eliminado')
+        return redirect(request.META.get('HTTP_REFERER', 'index'))
 
 @login_required
 def menu_preguntas(request):

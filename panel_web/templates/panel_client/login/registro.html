@@ -3,9 +3,10 @@
 {% block title %}SOVIO{% endblock %}
 
 {% block content %}
-    <div class="center">
-        <h1>Registra tus datos personales</h1>
-        <!--<form method="post">
+
+<div class="center">
+    <h1>Registra tus datos personales</h1>
+    <!--<form method="post">
             <div class="txt_field">
                 <input type="text">
                 <span></span>
@@ -22,33 +23,35 @@
                 Not remember password? <a href="#">Click here</a>
             </div>
         </form>-->
-        <form method="post">
-            {% csrf_token %}
-            <div class="txt_field">
-                <input name="nombre_alumno" id="nombre_alumno" type="text" required>
-                <span></span>
-                <label for="">Nombre</label>
-            </div>
-            <div class="txt_field">
-                <input name="apellido_alumno" id="apellido_alumno" type="text" required>
-                <span></span>
-                <label for="">Apellido</label>
-            </div>
-            <div class="txt_field">
-                <input name="dni_alumno" id="dni_alumno" type="text" value="{{request.session.dniAlumno}}"> 
-                <span></span>
-                <label for="">Dni</label>
-            </div>
-            
-            <div class="txt_field">
-                <input name="fecha_nacimiento_alumno" id="fecha_nacimiento_alumno" type="date" required >
-                <span></span>
-                <label for="">Fecha de nacimiento</label>
-            </div>
+    <form method="post">
+        {% csrf_token %}
+        <div class="txt_field">
+            <input name="nombre_alumno" id="nombre_alumno" type="text" required>
+            <span></span>
+            <label for="">Nombre</label>
+        </div>
+        <div class="txt_field">
+            <input name="apellido_alumno" id="apellido_alumno" type="text" required>
+            <span></span>
+            <label for="">Apellido</label>
+        </div>
+        <div class="txt_field">
+            <input disabled name="dni_alumno" id="dni_alumno" type="text" value="{{request.session.dniAlumno}}"  onblur="verifyDni()">
+            <span></span>
+            <label for="">Dni</label>
+        </div>
+
+        <div class="txt_field">
+            <input name="fecha_nacimiento_alumno" id="fecha_nacimiento_alumno" type="date" required>
+            <span></span>
+            <label for="">Fecha de nacimiento</label>
+        </div>
+
+        <div style="display: flex; justify-content: space-between;">
             <!--select-->
             <div class="txt_field">
                 <select name="grado_alumno" id="grado_alumno" required="">
-                    <option value="" selected disabled>Seleccione el grado</option>
+                    <option value="" selected disabled>Grado</option>
                     <option value="5">5to grado</option>
                     <option value="4">4to grado</option>
                     <option value="3">3er grado</option>
@@ -61,36 +64,66 @@
             <!--sexo-->
             <div class="txt_field">
                 <select name="genero_alumno" id="genero_alumno" required="">
-                    <option value="" selected disabled>Seleccione el sexo</option>
+                    <option value="" selected disabled>Sexo</option>
                     <option value="1">Masculino</option>
                     <option value="0">Femenino</option>
                 </select>
                 <span></span>
                 <label for=""></label>
             </div>
-            <div class="pass"></div>
-            <button type="submit" class="btn"><i class="fa-solid fa-play"></i> Iniciar test</button>
-        </form>
-    </div>
+        </div>
+        <!-- <div class="pass"></div> -->
+        <button type="submit" class="btn"><i class="fa-solid fa-play"></i> Iniciar test</button>
+    </form>
+</div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script>
+    
+    // validacion de campos
+    const nombre_alumno = document.getElementById('nombre_alumno');
+    const apellido_alumno = document.getElementById('apellido_alumno');
+    const dni_alumno = document.getElementById('dni_alumno');
+    const fecha_nacimiento_alumno = document.getElementById('fecha_nacimiento_alumno');
+    const grado_alumno = document.getElementById('grado_alumno');
 
-    <script>
-        // validacion de campos
-        const nombre_alumno = document.getElementById('nombre_alumno');
-        const apellido_alumno = document.getElementById('apellido_alumno');
-        const dni_alumno = document.getElementById('dni_alumno');
-        const fecha_nacimiento_alumno = document.getElementById('fecha_nacimiento_alumno');
-        const grado_alumno = document.getElementById('grado_alumno');
-
-        // validar nombre que no acpete numeros Y QUE ACEPTEN MAYUSCULAS Y MINUSCULAS
-        nombre_alumno.addEventListener('input', function() {
-            if (this.value.match(/[^a-zA-Z ]/g)) {
-                this.value = this.value.replace(/[^a-zA-Z ]/g, '');
+    // validar nombre que no acpete numeros Y QUE ACEPTEN MAYUSCULAS Y MINUSCULAS
+    nombre_alumno.addEventListener('input', function () {
+        if (this.value.match(/[^a-zA-ZñÑ ]/g)) {
+            this.value = this.value.replace(/[^a-zA-ZñÑ ]/g, '');
+        }
+    });
+    apellido_alumno.addEventListener('input', function () {
+        if (this.value.match(/[^a-zA-ZñÑ ]/g)) {
+            this.value = this.value.replace(/[^a-zA-ZñÑ ]/g, '');
+        }
+    });
+    function verifyDni() {
+        let dniWrite = dni_alumno.value;
+        $.ajax({
+            url: "{% url 'verifyDniAlumno' %}",
+            type: "POST",
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                dni: dniWrite,
+            },
+            success: function (response) {
+                if (response.isExist == true) {
+                    let dniCurrent = '{{request.session.dniAlumno}}';
+                    if (dniCurrent != dniWrite) {
+                        Swal.fire({
+                            text: response.message,
+                            icon: 'error',
+                            toast: true,
+                            position: 'top-end',
+                            timer: 3000,
+                            timerProgressBar: true,
+                            showConfirmButton: false,
+                        })
+                        dni_alumno.value = dniCurrent;
+                    }
+                }
             }
         });
-        apellido_alumno.addEventListener('input', function() {
-            if (this.value.match(/[^a-zA-Z ]/g)) {
-                this.value = this.value.replace(/[^a-zA-Z ]/g, '');
-            }
-        });
-    </script>
+    }
+</script>
 {% endblock %}

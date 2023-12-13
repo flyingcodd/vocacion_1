@@ -64,7 +64,7 @@ class TAlumno(models.Model):
 
     class Meta:
         permissions = (
-            ('mispermisos_view_talumno', 'Puede ver las alumnos'),
+            ('mispermisos_view_talumno', 'Puede ver los alumnos'),
             ('mispermisos_add_talumno', 'Puede agregar alumnos'),
             ('mispermisos_change_talumno', 'Puede editar alumnos'),
             ('mispermisos_delete_talumno', 'Puede eliminar alumnos'),
