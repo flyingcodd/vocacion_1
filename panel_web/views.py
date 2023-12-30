@@ -277,6 +277,21 @@ def generar_pdf(request, id_ficha_alumno):
         
         url_logo = "http://" + request.get_host() + "/static/panel_client_registro/img/logo-ministerio.jpg"
         edad = (datetime.now().year)-(ficha_alumno.id_alumno.fecha_nacimiento_alumno.year)
+        # TIPIFICACION VOCACIONAL ## BEGIN ##
+        listVocaciones = TVocacion.objects.all()
+        tablaVocacionList = []
+        id_encuesta = TEncuesta.objects.get(id_alumno=ficha_alumno.id_alumno.id_alumno).id_encuesta
+        for v in listVocaciones:
+            caontidadPregutasPositivas = TRespuesta.objects.filter(id_encuesta=id_encuesta, id_pregunta__id_vocacion=v, valor_respuesta=1).count()
+            totalBaremos = v.start_baremos_vocacion + caontidadPregutasPositivas*v.intervalo_baremos_vocacion
+            tablaVocacionList.append({
+                'nombre_vocacion': v.nombre_vocacion,
+                'totalBaremos': totalBaremos,
+                'nivel_bajo': True if totalBaremos < 40 else False,
+                'nivel_medio': True if totalBaremos >= 40 and totalBaremos < 60 else False,
+                'nivel_alto': True if totalBaremos >= 60 else False,
+            })
+        # TIPIFICACION VOCACIONAL ## END ##
         context = {
             'ficha_alumno': ficha_alumno,
             'vocaciones': vocaciones,
@@ -284,7 +299,8 @@ def generar_pdf(request, id_ficha_alumno):
             'id_ficha_alumno': id_ficha_alumno,
             'edad': edad,
             'url_logo': url_logo,
-            'datos_psicologo': datos_psicologo
+            'datos_psicologo': datos_psicologo,
+            'tablaVocacionList': tablaVocacionList,
         }
         html = template.render(context)
         string = html.encode(encoding="UTF-8")
